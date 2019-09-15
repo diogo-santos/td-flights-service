@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 
 @Service
 public class FlightService {
@@ -66,13 +65,13 @@ public class FlightService {
                 flightMap.put("arrivesAt", flight.getDestinationAirport());
 
                 Map<String, Object> departsOn = new HashMap<>();
-                LocalDateTime departureDate = flight.getDepartureDate() != null ? LocalDateTime.parse(flight.getDepartureDate(), ISO_DATE_TIME) : LocalDateTime.now();
+                LocalDateTime departureDate = flight.getDepartureDate();
                 departsOn.put("date", departureDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
                 departsOn.put("time", departureDate.format(DateTimeFormatter.ofPattern("hh:mm a")));
                 flightMap.put("departsOn", departsOn);
 
                 Map<String, Object> arrivesOn = new HashMap<>();
-                LocalDateTime arrivalDate = flight.getArrivalDate() != null ? LocalDateTime.parse(flight.getArrivalDate(), ISO_DATE_TIME) : LocalDateTime.now();
+                LocalDateTime arrivalDate = flight.getArrivalDate();
                 arrivesOn.put("date", arrivalDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
                 arrivesOn.put("time", arrivalDate.format(DateTimeFormatter.ofPattern("hh:mm a")));
                 flightMap.put("arrivesOn", arrivesOn);
@@ -110,11 +109,11 @@ public class FlightService {
                     farePricesMap.put(fareType, fareMap);
                 }
                 flightMap.put("farePrices", farePricesMap);
-                flights.add(flightMap);
+                flights.add(new HashMap<String, Map>(){{put("flight", flightMap);}});
             }
         }
         Map<String, Object> availabilityMap = new HashMap<>();
-        availabilityMap.put("availability", new HashMap<String, Object>(){{put("flights", flights);}});
+        availabilityMap.put("availability", flights);
         return availabilityMap;
     }
 }

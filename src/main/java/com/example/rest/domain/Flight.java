@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,9 +28,11 @@ public class Flight {
     @XmlElement(name = "DestinationAirport")
     private String destinationAirport;
     @XmlElement(name = "DepartureDate")
-    private String departureDate;
+    @XmlJavaTypeAdapter(value = LocalDateTimeAdapter.class)
+    private LocalDateTime departureDate;
     @XmlElement(name = "ArrivalDate")
-    private String arrivalDate;
+    @XmlJavaTypeAdapter(value = LocalDateTimeAdapter.class)
+    private LocalDateTime arrivalDate;
     @XmlElement(name = "Fares")
     private Fares fares;
 
