@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Map;
 
@@ -21,18 +20,6 @@ public class FlightServiceTests {
 
 	@Autowired
 	private FlightService service;
-
-	@Test
-	public void getSourceAvailabilityTest() {
-		String origin = "IST";
-		String destination = "DUB";
-		LocalDate start = LocalDate.of(2014,1,1);
-		LocalDate end = LocalDate.of(2014,1, 2);
-		int pax = 1;
-		Availability availability = service.getSourceAvailability(origin, destination, start, end, pax);
-		assertThat(availability).isNotNull();
-		assertThat(availability.getFlights()).extracting(Flight::getOriginAirport).contains(origin);
-	}
 
 	@Test
 	public void convertToMapTest() {

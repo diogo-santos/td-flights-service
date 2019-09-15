@@ -7,11 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import java.io.InputStream;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,37 +18,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
-
 @Service
 public class FlightService {
     private Logger logger = LoggerFactory.getLogger(FlightService.class);
-    private final Environment environment;
+    private final WebClient webClient;
 
-    public FlightService(Environment environment) {
-        this.environment = environment;
+    public FlightService(Environment environment, WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder.baseUrl(environment.getRequiredProperty("url.get.availability")).build();
     }
 
     public Map<String, Object> getAvailability(String origin, String destination,
                                                LocalDate start, LocalDate end, int pax) {
-
-        Availability availability = this.getSourceAvailability(origin, destination, start, end, pax);
-        return convertToMap(availability);
-    }
-
-    public Availability getSourceAvailability(String origin, String destination,
-                                              LocalDate start, LocalDate end, int pax) {
-        Availability availability = null;
-        try {
-            URL urlObject = new URL(environment.getRequiredProperty("url.get.availability")
-                                    + format("/%s/%s/%s/%s/%s", origin, destination, start, end, pax));
-            InputStream inputStream = urlObject.openStream();
-            Unmarshaller unmarshaller = JAXBContext.newInstance(Availability.class).createUnmarshaller();
-            availability = (Availability) unmarshaller.unmarshal(inputStream);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-        return availability;
+        logger.debug("In getAvailability with {} {} {} {} {}", origin, destination, start, end, pax);
+        final Availability availability = webClient.get()
+                .uri("/{origin}/{destination}/{start}/{end}/{pax}",
+                        origin, destination, start, end, pax)
+                .retrieve()
+                .bodyToMono(Availability.class).block();
+        Map<String, Object> availabilityMap = convertToMap(availability);
+        logger.debug("Out getAvailability with {}", availabilityMap);
+        return availabilityMap;
     }
 
     Map<String, Object> convertToMap(Availability availability) {
