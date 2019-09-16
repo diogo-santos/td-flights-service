@@ -22,7 +22,7 @@ public class FlightController {
 
     @GetMapping("/flights/{origin}/{destination}/{start}/{end}/{pax}")
     @ResponseStatus(OK)
-    public Map<String, Object> getAvailability(@PathVariable String origin,
+    public Map getAvailability(@PathVariable String origin,
                                                @PathVariable String destination,
                                                @PathVariable @DateTimeFormat(iso = DATE) LocalDate start,
                                                @PathVariable @DateTimeFormat(iso = DATE) LocalDate end,
